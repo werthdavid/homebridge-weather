@@ -18,7 +18,7 @@ A homebridge temperature sensor for displaying the weather at your current locat
 {
   "accessory": "Weather",
   "apikey": "YOUR_KEY_HERE",
-  "location": "Stuttgart,de", // Alternatives are listed below, make sure only one location parameter is configured at the same time
+  "location": "Stuttgart,de",
   "name": "OpenWeatherMap Temperature"
 }
 ```

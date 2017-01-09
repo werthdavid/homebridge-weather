@@ -14,7 +14,10 @@ function WeatherAccessory(log, config) {
     this.log = log;
     this.name = config["name"];
     this.apikey = config["apikey"];
-    this.location = config["location"];
+    this.locationByCity = config["location"];
+    this.locationById = config["locationById"];
+    this.locationByCoordinates = config["locationByCoordinates"];
+    this.locationByZip = config["locationByZip"];
     this.lastupdate = 0;
     this.temperature = 0;
 }
@@ -24,7 +27,17 @@ WeatherAccessory.prototype =
         getState: function (callback) {
             // Only fetch new data once per hour
             if (this.lastupdate + (60 * 60) < (Date.now() / 1000 | 0)) {
-                var url = "http://api.openweathermap.org/data/2.5/weather?q=" + this.location + "&APPID=" + this.apikey;
+                var url = "http://api.openweathermap.org/data/2.5/weather?APPID=" + this.apikey + "&";
+                if (this.locationByCity) {
+                    url += "q=" + this.locationByCity;
+                } else if (this.locationById) {
+                    url += "id=" + this.locationById;
+                } else if (this.locationByCoordinates) {
+                    url += this.locationByCoordinates;
+                } else if (this.locationByZip) {
+                    url += "zip=" + this.locationByZip;
+                }
+                
                 this.httpRequest(url, function (error, response, responseBody) {
                     if (error) {
                         this.log("HTTP get weather function failed: %s", error.message);
@@ -47,8 +60,8 @@ WeatherAccessory.prototype =
         },
 
         identify: function (callback) {
-            this.log("Identify requested!");
-            callback(); // success
+            this.log("Identify requested");
+            callback();
         },
 
         getServices: function () {
@@ -57,7 +70,7 @@ WeatherAccessory.prototype =
             informationService
                 .setCharacteristic(Characteristic.Manufacturer, "OpenWeatherMap")
                 .setCharacteristic(Characteristic.Model, "Location")
-                .setCharacteristic(Characteristic.SerialNumber, "");
+                .setCharacteristic(Characteristic.SerialNumber, "XDWS13");
 
             temperatureService = new Service.TemperatureSensor(this.name);
             temperatureService

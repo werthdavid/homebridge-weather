@@ -28,6 +28,7 @@ WeatherAccessory.prototype =
             // Only fetch new data once per hour
             if (this.lastupdate + (60 * 60) < (Date.now() / 1000 | 0)) {
                 var url = "http://api.openweathermap.org/data/2.5/weather?APPID=" + this.apikey + "&";
+                
                 if (this.locationByCity) {
                     url += "q=" + this.locationByCity;
                 } else if (this.locationById) {

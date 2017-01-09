@@ -54,4 +54,3 @@ Fields:
 * OR `locationByCoordinates` geo query string (resembles to <a href="https://openweathermap.org/current#geo">geo-parameter</a>) (required).
 * OR `locationByZip` zip query string (resembles to <a href="https://openweathermap.org/current#zip">zip-parameter</a>) (required).
 * `name` is the name of the published accessory (required).
-

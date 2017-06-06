@@ -1,6 +1,6 @@
 # homebridge-weather
 
-A homebridge temperature sensor for displaying the weather at your current location.
+A homebridge temperature sensor for displaying the weather (and optional the humidity) at your current location.
 
 # Installation
 
@@ -54,3 +54,4 @@ Fields:
 * OR `locationByCoordinates` geo query string (resembles to <a href="https://openweathermap.org/current#geo">geo-parameter</a>) (required).
 * OR `locationByZip` zip query string (resembles to <a href="https://openweathermap.org/current#zip">zip-parameter</a>) (required).
 * `name` is the name of the published accessory (required).
+* `showHumidity` weather or not show the humidity (optional).

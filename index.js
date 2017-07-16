@@ -93,7 +93,6 @@ WeatherAccessory.prototype =
                 }.bind(this));
             } else {
                 this.log("Returning cached data Humidity", this.humidity);
-                temperatureService.setCharacteristic(Characteristic.CurrentRelativeHumidity, this.humidity);
                 callback(null, this.humidity);
             }
         },

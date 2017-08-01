@@ -1,6 +1,6 @@
 # homebridge-weather
 
-A homebridge temperature sensor for displaying the weather (and optional the humidity) at your current location.
+A homebridge plugin that acts as temperature sensor for displaying the weather (and optional the humidity) at your current location.
 
 # Installation
 
@@ -8,7 +8,7 @@ A homebridge temperature sensor for displaying the weather (and optional the hum
 2. Install this plugin using: `npm install -g homebridge-weather`
 3. Get an API-Key from <a href="http://openweathermap.org">openweathermap.org</a>
 4. <a href="https://openweathermap.org/city">Find</a> your city (make sure the query only returns a single result). Alternatively you can use a different query parameter (see 'Fields')
-5. Update your Homebridge `config.json` using the sample below.
+5. Update your Homebridge `config.json` using the sample below (in the block 'accessories' not 'platforms').
 
 # Configuration
 

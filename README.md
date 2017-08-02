@@ -1,6 +1,6 @@
 # homebridge-weather
 
-A homebridge plugin that acts as temperature sensor for displaying the weather, humidity and min- or max-temperature at your current location based on openweathermap.org
+A homebridge plugin that acts as temperature sensor for displaying the weather, humidity and min- or max-temperature for a desired location based on openweathermap.org
 
 # Installation
 
@@ -50,7 +50,6 @@ To show daily min/max values, you have to add two additional accessories:
 
 ```json
 "accessories": [
-...
   {
      "accessory":"Weather",
      "apikey":"YOUR_KEY_HERE",
@@ -70,6 +69,7 @@ To show daily min/max values, you have to add two additional accessories:
 
 
 **You can add multiple accessories if you want to display additional information like min/max or the temperature of different locations. Just make sure that the filed `name` is unique**
+
 
 Take a look at the <a href="config.example.json">example config.json</a>
 

@@ -20,81 +20,93 @@ function WeatherAccessory(log, config) {
     this.locationByCoordinates = config["locationByCoordinates"];
     this.locationByZip = config["locationByZip"];
     this.showHumidity = config["showHumidity"] || true;
+    this.type = config["type"] || "current";
+    this.cachedWeatherObj = undefined;
     this.lastupdate = 0;
-    this.temperature = 0;
-    this.humidity = 0;
 }
 
 WeatherAccessory.prototype =
     {
         getStateTemp: function (callback) {
-            // Only fetch new data once per hour
-            if (this.lastupdate + (60 * 60) < (Date.now() / 1000 | 0)) {
-                var url = "http://api.openweathermap.org/data/2.5/weather?APPID=" + this.apikey + "&";
-
-                if (this.locationByCity) {
-                    url += "q=" + this.locationByCity;
-                } else if (this.locationById) {
-                    url += "id=" + this.locationById;
-                } else if (this.locationByCoordinates) {
-                    url += this.locationByCoordinates;
-                } else if (this.locationByZip) {
-                    url += "zip=" + this.locationByZip;
-                }
-
+            // Only fetch new data once per 30 mins
+            if (this.lastupdate + (60 * 30) < (Date.now() / 1000 | 0)) {
+                var url = this.makeURL();
                 this.httpRequest(url, function (error, response, responseBody) {
                     if (error) {
                         this.log("HTTP get weather function failed: %s", error.message);
                         callback(error);
                     } else {
-                        this.log("HTTP Response", responseBody);
-                        var weatherObj = JSON.parse(responseBody);
-                        var kelvin = parseFloat(weatherObj.main.temp);
-                        var temperature = (kelvin - 273);
-                        this.temperature = temperature;
+                        this.cachedWeatherObj = JSON.parse(responseBody);
                         this.lastupdate = (Date.now() / 1000);
+                        var temperature = this.returnTemp();
                         callback(null, temperature);
                     }
                 }.bind(this));
             } else {
-                this.log("Returning cached data Temperature", this.temperature);
-                temperatureService.setCharacteristic(Characteristic.CurrentTemperature, this.temperature);
-                callback(null, this.temperature);
+                var temperature = this.returnTemp();
+                this.log("Returning cached data", temperature);
+                // temperatureService.setCharacteristic(Characteristic.CurrentTemperature, temperature);
+                callback(null, temperature);
             }
         },
 
         getStateHum: function (callback) {
-            // Only fetch new data once per hour
-            if (this.lastupdate + (60 * 60) < (Date.now() / 1000 | 0)) {
-                var url = "http://api.openweathermap.org/data/2.5/weather?APPID=" + this.apikey + "&";
-
-                if (this.locationByCity) {
-                    url += "q=" + this.locationByCity;
-                } else if (this.locationById) {
-                    url += "id=" + this.locationById;
-                } else if (this.locationByCoordinates) {
-                    url += this.locationByCoordinates;
-                } else if (this.locationByZip) {
-                    url += "zip=" + this.locationByZip;
-                }
-
+            // Only fetch new data once per 30 mins
+            if (this.lastupdate + (60 * 30) < (Date.now() / 1000 | 0)) {
+                var url = this.makeURL();
                 this.httpRequest(url, function (error, response, responseBody) {
                     if (error) {
                         this.log("HTTP get weather function failed: %s", error.message);
                         callback(error);
                     } else {
-                        this.log("HTTP Response", responseBody);
-                        var weatherObj = JSON.parse(responseBody);
-                        var humidity = parseFloat(weatherObj.main.humidity);
-                        this.humidity = humidity;
+                        this.cachedWeatherObj = JSON.parse(responseBody);
                         this.lastupdate = (Date.now() / 1000);
+                        var humidity = parseFloat(this.cachedWeatherObj["main"]["humidity"]);
                         callback(null, humidity);
                     }
                 }.bind(this));
             } else {
-                this.log("Returning cached data Humidity", this.humidity);
-                callback(null, this.humidity);
+                var humidity = parseFloat(this.cachedWeatherObj["main"]["humidity"]);
+                this.log("Returning cached data", humidity);
+                // temperatureService.setCharacteristic(Characteristic.CurrentTemperature, temperature);
+                callback(null, humidity);
             }
+        },
+
+        returnTemp: function () {
+            var temperature = 0;
+            if (this.cachedWeatherObj) {
+                if (this.type === "min") {
+                    temperature = parseFloat(this.cachedWeatherObj["list"][0]["temp"]["min"]);
+                } else if (this.type === "max") {
+                    temperature = parseFloat(this.cachedWeatherObj["list"][0]["temp"]["max"]);
+                } else {
+                    temperature = parseFloat(this.cachedWeatherObj["main"]["temp"]);
+                }
+                this.log("Fetched temperature " + temperature + " of type " + this.type + " for " + this.name);
+            }
+            return temperature;
+        },
+
+        makeURL: function () {
+            var url = "http://api.openweathermap.org/data/2.5/";
+            if (this.type === "current") {
+                url += "weather"
+            } else {
+                url += "forecast/daily"
+            }
+
+            url += "?APPID=" + this.apikey + "&units=metric&";
+            if (this.locationByCity) {
+                url += "q=" + this.locationByCity;
+            } else if (this.locationById) {
+                url += "id=" + this.locationById;
+            } else if (this.locationByCoordinates) {
+                url += this.locationByCoordinates;
+            } else if (this.locationByZip) {
+                url += "zip=" + this.locationByZip;
+            }
+            return url;
         },
 
         identify: function (callback) {
@@ -123,7 +135,7 @@ WeatherAccessory.prototype =
                 .getCharacteristic(Characteristic.CurrentTemperature)
                 .setProps({maxValue: 120});
 
-            if (this.showHumidity) {
+            if (this.showHumidity && this.type === "current") {
                 humidityService = new Service.HumiditySensor(this.name);
                 humidityService
                     .getCharacteristic(Characteristic.CurrentRelativeHumidity)

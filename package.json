@@ -1,6 +1,6 @@
 {
   "name": "homebridge-weather",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "A homebridge temperature sensor for displaying the weather at your current location.",
   "main": "index.js",
   "scripts": {

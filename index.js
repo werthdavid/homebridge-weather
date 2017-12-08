@@ -19,7 +19,12 @@ function WeatherAccessory(log, config) {
     this.locationById = config["locationById"];
     this.locationByCoordinates = config["locationByCoordinates"];
     this.locationByZip = config["locationByZip"];
-    this.showHumidity = config["showHumidity"] || true;
+    if (config["showHumidity"] != null) {
+        this.showHumidity = config["showHumidity"];
+    } else {
+        this.showHumidity = true;
+    }
+
     this.type = config["type"] || "current";
     this.cachedWeatherObj = undefined;
     this.lastupdate = 0;

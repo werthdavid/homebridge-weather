@@ -26,6 +26,6 @@
   },
   "homepage": "https://github.com/werthdavid/homebridge-weather#readme",
   "dependencies": {
-    "request": "^2.65.0"
+    "request": "^2.83.0"
   }
 }

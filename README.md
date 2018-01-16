@@ -70,8 +70,20 @@ To show daily min/max values, you have to add two additional accessories:
 ]
 ```
 
-
 **You can add multiple accessories if you want to display additional information like min/max or the temperature of different locations. Just make sure that the field `name` is unique**
+
+
+## Polling
+
+By default, no polling-interval is specified. That means, the temperature is only updated when the Home-App is opened. 
+There might be scenarios though, where you would want to periodically update the temperature e.g. as source for trigger-rules.
+
+OpenWeatherMap has a generous amount of [free calls](http://openweathermap.org/price#weather) per API-key: you can poll the temperature up to 60 times a minute.
+Beware that **just because you can doesn't mean you should**
+
+I'd also suggest that you add a polling-interval only for the `type` *current*, since *min* and *max* are forecasts and probably won't change throughout the day.
+
+## Config file
 
 
 Take a look at the <a href="config.example.json">example config.json</a>
@@ -88,3 +100,4 @@ Fields:
 * `name` is the name of the published accessory (required).
 * `showHumidity` weather or not show the humidity (optional, only works for current weather not forecast).
 * `type` the type of the displayed value, either "min", "max" or "current" (optional, defaults to "current")
+* `pollingInterval` the time (in minutes) for periodically updating the temperature (optional, defaults to 0 which means polling only happens when opening the Home-App)

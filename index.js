@@ -24,17 +24,49 @@ function WeatherAccessory(log, config) {
     } else {
         this.showHumidity = true;
     }
+    if (config["pollingInterval"] != null) {
+        this.pollingInterval = parseInt(config["pollingInterval"]) * 1000 * 60;
+    } else {
+        this.pollingInterval = 0;
+    }
 
     this.type = config["type"] || "current";
     this.cachedWeatherObj = undefined;
     this.lastupdate = 0;
+
+    // start periodical polling in background with setTimeout
+    if (this.pollingInterval > 0) {
+        var that = this;
+        setTimeout(function () {
+            that.backgroundPolling();
+        }, this.pollingInterval);
+    }
 }
 
 WeatherAccessory.prototype =
     {
+        backgroundPolling: function () {
+            this.log.info("Polling data in background");
+            this.getStateTemp(function (error, temperature) {
+                if (!error && temperature != null) {
+                    temperatureService.setCharacteristic(Characteristic.CurrentTemperature, temperature);
+                }
+            }.bind(this));
+            this.getStateHum(function (error, humidity) {
+                if (!error && humidity != null) {
+                    humidityService.setCharacteristic(Characteristic.CurrentRelativeHumidity, humidity);
+                }
+            }.bind(this));
+
+            var that = this;
+            setTimeout(function () {
+                that.backgroundPolling();
+            }, this.pollingInterval);
+        },
+
         getStateTemp: function (callback) {
             // Only fetch new data once per 30 mins
-            if (this.lastupdate + (60 * 30) < (Date.now() / 1000 | 0)) {
+            if (this.lastupdate + (60 * 30) < (Date.now() / 1000 | 0) || this.pollingInterval > 0) {
                 var url = this.makeURL();
                 this.httpRequest(url, function (error, response, responseBody) {
                     if (error) {
@@ -50,14 +82,13 @@ WeatherAccessory.prototype =
             } else {
                 var temperature = this.returnTemp();
                 this.log("Returning cached data", temperature);
-                // temperatureService.setCharacteristic(Characteristic.CurrentTemperature, temperature);
                 callback(null, temperature);
             }
         },
 
         getStateHum: function (callback) {
             // Only fetch new data once per 30 mins
-            if (this.lastupdate + (60 * 30) < (Date.now() / 1000 | 0)) {
+            if (this.lastupdate + (60 * 30) < (Date.now() / 1000 | 0) || this.pollingInterval > 0) {
                 var url = this.makeURL();
                 this.httpRequest(url, function (error, response, responseBody) {
                     if (error) {

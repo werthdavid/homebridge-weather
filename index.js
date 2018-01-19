@@ -65,8 +65,8 @@ WeatherAccessory.prototype =
         },
 
         getStateTemp: function (callback) {
-            // Only fetch new data once per 30 mins
-            if (this.lastupdate + (60 * 30) < (Date.now() / 1000 | 0) || this.pollingInterval > 0) {
+            // Only fetch new data once per minute
+            if (!this.cachedWeatherObj || this.pollingInterval > 0 || this.lastupdate + 60 < (Date.now() / 1000 | 0)) {
                 var url = this.makeURL();
                 this.httpRequest(url, function (error, response, responseBody) {
                     if (error) {
@@ -87,8 +87,8 @@ WeatherAccessory.prototype =
         },
 
         getStateHum: function (callback) {
-            // Only fetch new data once per 30 mins
-            if (this.lastupdate + (60 * 30) < (Date.now() / 1000 | 0) || this.pollingInterval > 0) {
+            // Only fetch new data once per minute
+            if (!this.cachedWeatherObj || this.pollingInterval > 0 || this.lastupdate + 60 < (Date.now() / 1000 | 0)) {
                 var url = this.makeURL();
                 this.httpRequest(url, function (error, response, responseBody) {
                     if (error) {

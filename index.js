@@ -14,6 +14,7 @@ module.exports = function (homebridge) {
 function WeatherAccessory(log, config) {
     this.log = log;
     this.name = config["name"];
+    this.nameHumidity = config["nameHumidity"] || config["name"];
     this.apikey = config["apikey"];
     this.locationByCity = config["location"];
     this.locationById = config["locationById"];
@@ -172,7 +173,7 @@ WeatherAccessory.prototype =
                 .setProps({maxValue: 120});
 
             if (this.showHumidity && this.type === "current") {
-                humidityService = new Service.HumiditySensor(this.name);
+                humidityService = new Service.HumiditySensor(this.nameHumidity);
                 humidityService
                     .getCharacteristic(Characteristic.CurrentRelativeHumidity)
                     .on("get", this.getStateHum.bind(this));

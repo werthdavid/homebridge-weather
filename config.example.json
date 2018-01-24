@@ -11,7 +11,8 @@
       "accessory":"Weather",
       "apikey":"YOUR_KEY_HERE",
       "locationByCoordinates": "lat=48.70798341&lon=9.17019367",
-      "name":"Current",
+      "name":"Current Temp",
+      "nameHumidity":"Current Humidity",
       "pollingInterval":"10"
     },
     {

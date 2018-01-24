@@ -98,6 +98,7 @@ Fields:
 * OR `locationByCoordinates` geo query string (resembles to <a href="https://openweathermap.org/current#geo">geo-parameter</a>) (required).
 * OR `locationByZip` zip query string (resembles to <a href="https://openweathermap.org/current#zip">zip-parameter</a>) (required).
 * `name` is the name of the published accessory (required).
-* `showHumidity` weather or not show the humidity (optional, only works for current weather not forecast).
+* `showHumidity` weather or not show the humidity (optional, only works for current weather not forecast, defaults to true).
+* `nameHumidity` humidity can have a different name (optional, only works if `showHumidity` is true, defaults to the same as `name`).
 * `type` the type of the displayed value, either "min", "max" or "current" (optional, defaults to "current")
 * `pollingInterval` the time (in minutes) for periodically updating the temperature (optional, defaults to 0 which means polling only happens when opening the Home-App)

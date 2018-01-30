@@ -83,6 +83,14 @@ Beware that **just because you can doesn't mean you should**
 
 I'd also suggest that you add a polling-interval only for the `type` *current*, since *min* and *max* are forecasts and probably won't change throughout the day.
 
+## Temperature profile with Elgato Eve App ([FakeGato](https://github.com/simont77/fakegato-history) support)
+
+With the `enableHistory` flag, the FakeGato-service is used to log temperature and humidity. [Example-Screenshot](http://ned.sudduth.org/wp-content/uploads/2015/09/Apple-TV-HomeKit-Elgato-Eve-Weather8-576x1024.jpg)
+Since FakeGato requires to log an entry at least every 10 minutes, this feature only becomes active if you set `enableHistory` to true AND define an `pollingInterval`!
+
+This feature is currently **experimental**
+
+
 ## Config file
 
 
@@ -102,3 +110,8 @@ Fields:
 * `nameHumidity` humidity can have a different name (optional, only works if `showHumidity` is true, defaults to the same as `name`).
 * `type` the type of the displayed value, either "min", "max" or "current" (optional, defaults to "current")
 * `pollingInterval` the time (in minutes) for periodically updating the temperature (optional, defaults to 0 which means polling only happens when opening the Home-App)
+* `enableHistory` flag for enabling the FakeGato-service (see above) for temperature and humidity logging (optional, defaults to false, only works when polling is enabled)
+
+## Known Issues
+
+* Can't trigger scenes: try [Hesperus App](https://itunes.apple.com/de/app/hesperus/id969348892?mt=8)

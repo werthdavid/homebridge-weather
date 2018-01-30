@@ -1,19 +1,26 @@
 "use strict";
 
-var Service, Characteristic;
+var Service, Characteristic, FakeGatoHistoryService;
 var temperatureService;
 var humidityService;
 var request = require("request");
+var os = require("os");
+var hostname = os.hostname();
 
 module.exports = function (homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
+    FakeGatoHistoryService = require('fakegato-history')(homebridge);
     homebridge.registerAccessory("homebridge-weather", "Weather", WeatherAccessory);
 };
 
 function WeatherAccessory(log, config) {
     this.log = log;
+    // FakeGato
+    this.fakeGateHistoryService = undefined;
+    // Load settings from the config
     this.name = config["name"];
+    // Humidity-sensor can have a divergent name
     this.nameHumidity = config["nameHumidity"] || config["name"];
     this.apikey = config["apikey"];
     this.locationByCity = config["location"];
@@ -30,6 +37,11 @@ function WeatherAccessory(log, config) {
     } else {
         this.pollingInterval = 0;
     }
+    if (config["enableHistory"] != null) {
+        this.enableHistory = config["enableHistory"];
+    } else {
+        this.enableHistory = false;
+    }
 
     this.type = config["type"] || "current";
     this.cachedWeatherObj = undefined;
@@ -37,6 +49,7 @@ function WeatherAccessory(log, config) {
 
     // start periodical polling in background with setTimeout
     if (this.pollingInterval > 0) {
+        this.log("Starting Polling background service for", this.name);
         var that = this;
         setTimeout(function () {
             that.backgroundPolling();
@@ -67,7 +80,7 @@ WeatherAccessory.prototype =
 
         getStateTemp: function (callback) {
             // Only fetch new data once per minute
-            if (!this.cachedWeatherObj || this.pollingInterval > 0 || this.lastupdate + 60 < (Date.now() / 1000 | 0)) {
+            if (!this.cachedWeatherObj || this.pollingInterval > 0 || this.lastupdate + 60 < (new Date().getTime() / 1000 | 0)) {
                 var url = this.makeURL();
                 this.httpRequest(url, function (error, response, responseBody) {
                     if (error) {
@@ -75,21 +88,23 @@ WeatherAccessory.prototype =
                         callback(error);
                     } else {
                         this.cachedWeatherObj = JSON.parse(responseBody);
-                        this.lastupdate = (Date.now() / 1000);
-                        var temperature = this.returnTemp();
+                        this.lastupdate = (new Date().getTime() / 1000);
+                        var temperature = this.returnTempFromCache();
+                        this.addHistoryTemperature(temperature);
                         callback(null, temperature);
                     }
                 }.bind(this));
             } else {
-                var temperature = this.returnTemp();
+                var temperature = this.returnTempFromCache();
                 this.log("Returning cached data", temperature);
+                this.addHistoryTemperature(temperature);
                 callback(null, temperature);
             }
         },
 
         getStateHum: function (callback) {
             // Only fetch new data once per minute
-            if (!this.cachedWeatherObj || this.pollingInterval > 0 || this.lastupdate + 60 < (Date.now() / 1000 | 0)) {
+            if (!this.cachedWeatherObj || this.pollingInterval > 0 || this.lastupdate + 60 < (new Date().getTime() / 1000 | 0)) {
                 var url = this.makeURL();
                 this.httpRequest(url, function (error, response, responseBody) {
                     if (error) {
@@ -97,20 +112,21 @@ WeatherAccessory.prototype =
                         callback(error);
                     } else {
                         this.cachedWeatherObj = JSON.parse(responseBody);
-                        this.lastupdate = (Date.now() / 1000);
+                        this.lastupdate = (new Date().getTime() / 1000);
                         var humidity = parseFloat(this.cachedWeatherObj["main"]["humidity"]);
+                        this.addHistoryHumidity(humidity);
                         callback(null, humidity);
                     }
                 }.bind(this));
             } else {
                 var humidity = parseFloat(this.cachedWeatherObj["main"]["humidity"]);
                 this.log("Returning cached data", humidity);
-                // temperatureService.setCharacteristic(Characteristic.CurrentTemperature, temperature);
+                this.addHistoryHumidity(humidity);
                 callback(null, humidity);
             }
         },
 
-        returnTemp: function () {
+        returnTempFromCache: function () {
             var temperature = 0;
             if (this.cachedWeatherObj) {
                 if (this.type === "min") {
@@ -146,6 +162,34 @@ WeatherAccessory.prototype =
             return url;
         },
 
+        /**
+         * Log the humidity to the FakeGato-service.
+         * Only works if enableHistory is true and  pollingInterval > 0
+         * @param humidity
+         */
+        addHistoryHumidity: function (humidity) {
+            if (this.enableHistory && this.pollingInterval > 0 && this.fakeGateHistoryService && humidity) {
+                this.fakeGateHistoryService.addEntry({
+                    time: new Date().getTime() / 1000,
+                    humidity: humidity
+                });
+            }
+        },
+
+        /**
+         * Log the temperature to the FakeGato-service.
+         * Only works if enableHistory is true and  pollingInterval > 0
+         * @param temperature
+         */
+        addHistoryTemperature: function (temperature) {
+            if (this.enableHistory && this.pollingInterval > 0 && this.fakeGateHistoryService && temperature) {
+                this.fakeGateHistoryService.addEntry({
+                    time: new Date().getTime() / 1000,
+                    temperature: temperature
+                });
+            }
+        },
+
         identify: function (callback) {
             this.log("Identify requested");
             callback();
@@ -157,7 +201,7 @@ WeatherAccessory.prototype =
             informationService
                 .setCharacteristic(Characteristic.Manufacturer, "OpenWeatherMap")
                 .setCharacteristic(Characteristic.Model, "Location")
-                .setCharacteristic(Characteristic.SerialNumber, "XDWS13");
+                .setCharacteristic(Characteristic.SerialNumber, hostname + "-" + this.name);
 
             temperatureService = new Service.TemperatureSensor(this.name);
             temperatureService
@@ -172,15 +216,19 @@ WeatherAccessory.prototype =
                 .getCharacteristic(Characteristic.CurrentTemperature)
                 .setProps({maxValue: 120});
 
+            // FakeGato
+            temperatureService.log = this.log;
+            this.fakeGateHistoryService = new FakeGatoHistoryService("weather", temperatureService, 4032);
+
             if (this.showHumidity && this.type === "current") {
                 humidityService = new Service.HumiditySensor(this.nameHumidity);
                 humidityService
                     .getCharacteristic(Characteristic.CurrentRelativeHumidity)
                     .on("get", this.getStateHum.bind(this));
 
-                return [informationService, temperatureService, humidityService];
+                return [informationService, temperatureService, humidityService, this.fakeGateHistoryService];
             } else {
-                return [informationService, temperatureService];
+                return [informationService, temperatureService, this.fakeGateHistoryService];
             }
 
         },
@@ -199,8 +247,3 @@ WeatherAccessory.prototype =
 
     };
 
-if (!Date.now) {
-    Date.now = function () {
-        return new Date().getTime();
-    }
-}

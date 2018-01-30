@@ -1,6 +1,6 @@
 {
   "name": "homebridge-weather",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "A homebridge temperature sensor for displaying the weather at your current location.",
   "main": "index.js",
   "scripts": {
@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/werthdavid/homebridge-weather#readme",
   "dependencies": {
+    "fakegato-history": "^0.3.8",
     "request": "^2.83.0"
   }
 }

@@ -85,7 +85,10 @@ I'd also suggest that you add a polling-interval only for the `type` *current*, 
 
 ## Temperature profile with Elgato Eve App ([FakeGato](https://github.com/simont77/fakegato-history) support)
 
-With the `enableHistory` flag, the FakeGato-service is used to log temperature and humidity. [Example-Screenshot](http://ned.sudduth.org/wp-content/uploads/2015/09/Apple-TV-HomeKit-Elgato-Eve-Weather8-576x1024.jpg)
+With the `enableHistory` flag, the FakeGato-service is used to log temperature and humidity. 
+
+[Example-Screenshot](http://ned.sudduth.org/wp-content/uploads/2015/09/Apple-TV-HomeKit-Elgato-Eve-Weather8-576x1024.jpg)
+
 Since FakeGato requires to log an entry at least every 10 minutes, this feature only becomes active if you set `enableHistory` to true AND define an `pollingInterval`!
 
 This feature is currently **experimental**

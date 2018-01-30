@@ -150,7 +150,7 @@ WeatherAccessory.prototype =
         },
 
         returnTempFromCache: function () {
-            var temperature = 0;
+            var temperature;
             if (this.cachedWeatherObj) {
                 if (this.type === "min") {
                     temperature = parseFloat(this.cachedWeatherObj["list"][0]["temp"]["min"]);
@@ -165,7 +165,7 @@ WeatherAccessory.prototype =
         },
 
         returnHumFromCache: function () {
-            var humidity = 0;
+            var humidity;
             if (this.cachedWeatherObj && this.cachedWeatherObj["main"]) {
                 humidity = parseFloat(this.cachedWeatherObj["main"]["humidity"]);
                 this.log("Fetched humidity " + humidity + " of type " + this.type + " for " + this.name);
@@ -202,7 +202,7 @@ WeatherAccessory.prototype =
          * @param humidity
          */
         addHistory: function (temperature, humidity) {
-            if (this.enableHistory && this.pollingInterval > 0 && this.fakeGateHistoryService && (temperature || humidity) && (temperature > 0 || humidity > 0)) {
+            if (this.enableHistory && this.pollingInterval > 0 && this.fakeGateHistoryService && (temperature || humidity)) {
                 this.fakeGateHistoryService.addEntry({
                     time: new Date().getTime() / 1000,
                     temp: temperature,

@@ -202,7 +202,7 @@ WeatherAccessory.prototype =
          * @param humidity
          */
         addHistory: function (temperature, humidity) {
-            if (this.enableHistory && this.pollingInterval > 0 && this.fakeGateHistoryService && (temperature || humidity)) {
+            if (this.enableHistory && this.pollingInterval > 0 && this.fakeGateHistoryService && (temperature || humidity) && (temperature > 0 || humidity > 0)) {
                 this.fakeGateHistoryService.addEntry({
                     time: new Date().getTime() / 1000,
                     temp: temperature,

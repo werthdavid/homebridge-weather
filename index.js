@@ -139,6 +139,7 @@ WeatherAccessory.prototype =
          * @param responseBody
          */
         setCacheObj: function (responseBody) {
+            this.log.debug("Server response:", responseBody);
             this.cachedWeatherObj = JSON.parse(responseBody);
             this.lastupdate = (new Date().getTime() / 1000);
             var temperature = this.returnTempFromCache();

@@ -1,6 +1,6 @@
 {
   "name": "homebridge-weather",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "description": "Homebridge plugin for displaying the weather from openweathermap.org",
   "main": "index.js",
   "scripts": {

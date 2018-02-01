@@ -83,14 +83,28 @@ Beware that **just because you can doesn't mean you should**
 
 I'd also suggest that you add a polling-interval only for the `type` *current*, since *min* and *max* are forecasts and probably won't change throughout the day.
 
-## Temperature profile with Elgato Eve App ([FakeGato](https://github.com/simont77/fakegato-history) support)
+## Temperature profile with [Elgato Eve App](https://itunes.apple.com/de/app/elgato-eve/id917695792?mt=8) ([FakeGato](https://github.com/simont77/fakegato-history) support)
 
-With the `enableHistory` flag, the FakeGato-service is used to log temperature and humidity. 
+With the `enableHistory` flag, the FakeGato-service is used to log temperature and humidity. This doesn't work with the default Home-App, you have to use the Elgato Eve App.
 
-[Example-Screenshot](http://ned.sudduth.org/wp-content/uploads/2015/09/Apple-TV-HomeKit-Elgato-Eve-Weather8-576x1024.jpg)
+![eve-example](https://user-images.githubusercontent.com/4696067/35668836-601c4a10-0733-11e8-982e-fa2a406a46e7.jpg)
 
 Since FakeGato requires to log an entry at least every 10 minutes, this feature only becomes active if you set `enableHistory` to true AND define an `pollingInterval`!
 
+I suggest the following settings:
+
+```json
+"accessories": [
+    {
+       "accessory": "Weather",
+       "apikey": "YOUR_KEY_HERE",
+       "location": "Stuttgart,de",
+       "name": "OpenWeatherMap Temperature",
+       "pollingInterval": 10,
+       "enableHistory": true,
+     }
+]
+```
 
 ## Config file
 
@@ -115,4 +129,4 @@ Fields:
 
 ## Known Issues
 
-* Can't trigger scenes: try [Hesperus App](https://itunes.apple.com/de/app/hesperus/id969348892?mt=8)
+* Default Home-App can't trigger scenes: try [Hesperus App](https://itunes.apple.com/de/app/hesperus/id969348892?mt=8) instead

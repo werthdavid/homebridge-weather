@@ -1,7 +1,7 @@
 {
   "name": "homebridge-weather",
-  "version": "1.6.4",
-  "description": "A homebridge temperature sensor for displaying the weather at your current location.",
+  "version": "1.6.5",
+  "description": "Homebridge plugin for displaying the weather from openweathermap.org",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

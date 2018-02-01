@@ -91,8 +91,6 @@ With the `enableHistory` flag, the FakeGato-service is used to log temperature a
 
 Since FakeGato requires to log an entry at least every 10 minutes, this feature only becomes active if you set `enableHistory` to true AND define an `pollingInterval`!
 
-This feature is currently **experimental**
-
 
 ## Config file
 

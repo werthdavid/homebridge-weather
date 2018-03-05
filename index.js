@@ -10,7 +10,7 @@ var hostname = os.hostname();
 module.exports = function (homebridge) {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    FakeGatoHistoryService = require('fakegato-history')(homebridge);
+    FakeGatoHistoryService = require("fakegato-history")(homebridge);
     homebridge.registerAccessory("homebridge-weather", "Weather", WeatherAccessory);
 };
 
@@ -165,9 +165,9 @@ WeatherAccessory.prototype =
                     temperature = min;
                 } else if (this.type === "max") {
                     var max = parseFloat(this.cachedWeatherObj["list"][0]["main"]["temp_max"]);
-                    for (var i = 0, len = this.cachedWeatherObj["list"].length; i < len; i++) {
-                        if (parseFloat(this.cachedWeatherObj["list"][i]["main"]["temp_max"]) > max) {
-                            max = parseFloat(this.cachedWeatherObj["list"][i]["main"]["temp_max"]);
+                    for (var j = 0, len2 = this.cachedWeatherObj["list"].length; j < len2; j++) {
+                        if (parseFloat(this.cachedWeatherObj["list"][j]["main"]["temp_max"]) > max) {
+                            max = parseFloat(this.cachedWeatherObj["list"][j]["main"]["temp_max"]);
                         }
                     }
                     temperature = max;
@@ -191,10 +191,10 @@ WeatherAccessory.prototype =
         makeURL: function () {
             var url = "http://api.openweathermap.org/data/2.5/";
             if (this.type === "current") {
-                url += "weather"
+                url += "weather";
             } else {
                 // Min-/Max-sensors have different endpoint
-                url += "forecast"
+                url += "forecast";
             }
 
             url += "?APPID=" + this.apikey + "&units=metric&";
@@ -282,7 +282,7 @@ WeatherAccessory.prototype =
                     rejectUnauthorized: false
                 },
                 function (error, response, body) {
-                    callback(error, response, body)
+                    callback(error, response, body);
                 })
         }
 

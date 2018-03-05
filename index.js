@@ -154,9 +154,23 @@ WeatherAccessory.prototype =
             var temperature;
             if (this.cachedWeatherObj) {
                 if (this.type === "min") {
-                    temperature = parseFloat(this.cachedWeatherObj["list"][0]["temp"]["min"]);
+                    // Unfortunately we cannot use the "16 day weather forecast" API but the "5 day / 3 hour forecast" instead.
+                    // this API gives one min/max every 3 hours but we want the daily min/max so we have to iterate over all those data
+                    var min = parseFloat(this.cachedWeatherObj["list"][0]["main"]["temp_min"]);
+                    for (var i = 0, len = this.cachedWeatherObj["list"].length; i < len; i++) {
+                        if (parseFloat(this.cachedWeatherObj["list"][i]["main"]["temp_min"]) < min) {
+                            min = parseFloat(this.cachedWeatherObj["list"][i]["main"]["temp_min"]);
+                        }
+                    }
+                    temperature = min;
                 } else if (this.type === "max") {
-                    temperature = parseFloat(this.cachedWeatherObj["list"][0]["temp"]["max"]);
+                    var max = parseFloat(this.cachedWeatherObj["list"][0]["main"]["temp_max"]);
+                    for (var i = 0, len = this.cachedWeatherObj["list"].length; i < len; i++) {
+                        if (parseFloat(this.cachedWeatherObj["list"][i]["main"]["temp_max"]) > max) {
+                            max = parseFloat(this.cachedWeatherObj["list"][i]["main"]["temp_max"]);
+                        }
+                    }
+                    temperature = max;
                 } else {
                     temperature = parseFloat(this.cachedWeatherObj["main"]["temp"]);
                 }
@@ -180,7 +194,7 @@ WeatherAccessory.prototype =
                 url += "weather"
             } else {
                 // Min-/Max-sensors have different endpoint
-                url += "forecast/daily"
+                url += "forecast"
             }
 
             url += "?APPID=" + this.apikey + "&units=metric&";

@@ -153,11 +153,17 @@ WeatherAccessory.prototype =
         returnTempFromCache: function () {
             var temperature;
             if (this.cachedWeatherObj) {
+                var dayNow = new Date().getDay();
                 if (this.type === "min") {
                     // Unfortunately we cannot use the "16 day weather forecast" API but the "5 day / 3 hour forecast" instead.
                     // this API gives one min/max every 3 hours but we want the daily min/max so we have to iterate over all those data
                     var min = parseFloat(this.cachedWeatherObj["list"][0]["main"]["temp_min"]);
                     for (var i = 0, len = this.cachedWeatherObj["list"].length; i < len; i++) {
+                        var dayThen = new Date(this.cachedWeatherObj["list"][i]["dt"] * 1000).getDay();
+                        if (dayThen !== dayNow) {
+                            // API returns data for 5 days, we want min/max only for today
+                            break;
+                        }
                         if (parseFloat(this.cachedWeatherObj["list"][i]["main"]["temp_min"]) < min) {
                             min = parseFloat(this.cachedWeatherObj["list"][i]["main"]["temp_min"]);
                         }
@@ -166,6 +172,10 @@ WeatherAccessory.prototype =
                 } else if (this.type === "max") {
                     var max = parseFloat(this.cachedWeatherObj["list"][0]["main"]["temp_max"]);
                     for (var j = 0, len2 = this.cachedWeatherObj["list"].length; j < len2; j++) {
+                        var dayThen2 = new Date(this.cachedWeatherObj["list"][j]["dt"] * 1000).getDay();
+                        if (dayThen2 !== dayNow) {
+                            break;
+                        }
                         if (parseFloat(this.cachedWeatherObj["list"][j]["main"]["temp_max"]) > max) {
                             max = parseFloat(this.cachedWeatherObj["list"][j]["main"]["temp_max"]);
                         }

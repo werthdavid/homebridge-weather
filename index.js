@@ -101,15 +101,25 @@ WeatherAccessory.prototype =
                         this.log("HTTP get weather function failed: %s", error.message);
                         callback(error);
                     } else {
-                        this.setCacheObj(responseBody);
-                        var temperature = this.returnTempFromCache();
-                        callback(null, temperature);
+                        try {
+                            this.setCacheObj(responseBody);
+                            var temperature = this.returnTempFromCache();
+                            callback(null, temperature);
+                        } catch (error2) {
+                            this.log("Getting Temperature failed: %s", error2, response, responseBody);
+                            callback(error2);
+                        }
                     }
                 }.bind(this));
             } else {
-                var temperature = this.returnTempFromCache();
-                this.log("Returning cached data", temperature);
-                callback(null, temperature);
+                try {
+                    var temperature = this.returnTempFromCache();
+                    this.log("Returning cached data", temperature);
+                    callback(null, temperature);
+                } catch (error) {
+                    this.log("Getting Temperature failed: %s", error);
+                    callback(error);
+                }
             }
         },
 
@@ -122,15 +132,26 @@ WeatherAccessory.prototype =
                         this.log("HTTP get weather function failed: %s", error.message);
                         callback(error);
                     } else {
-                        this.setCacheObj(responseBody);
-                        var humidity = this.returnHumFromCache();
-                        callback(null, humidity);
+                        try {
+                            this.setCacheObj(responseBody);
+                            var humidity = this.returnHumFromCache();
+                            callback(null, humidity);
+                        } catch (error2) {
+                            this.log("Getting Humidity failed: %s", error2, response, responseBody);
+                            callback(error2);
+                        }
                     }
                 }.bind(this));
             } else {
-                var humidity = this.returnHumFromCache();
-                this.log("Returning cached data", humidity);
-                callback(null, humidity);
+                try {
+                    this.setCacheObj(responseBody);
+                    var humidity = this.returnHumFromCache();
+                    this.log("Returning cached data", humidity);
+                    callback(null, humidity);
+                } catch (error) {
+                    this.log("Getting Humidity failed: %s", error);
+                    callback(error);
+                }
             }
         },
 
@@ -184,7 +205,7 @@ WeatherAccessory.prototype =
                 } else {
                     temperature = parseFloat(this.cachedWeatherObj["main"]["temp"]);
                 }
-                this.log("Fetched temperature " + temperature + " of type " + this.type + " for " + this.name);
+                this.log("Fetched temperature value " + temperature + "deg of type '" + this.type + "' for accessory " + this.name);
             }
             return temperature;
         },
@@ -193,7 +214,7 @@ WeatherAccessory.prototype =
             var humidity;
             if (this.cachedWeatherObj && this.cachedWeatherObj["main"]) {
                 humidity = parseFloat(this.cachedWeatherObj["main"]["humidity"]);
-                this.log("Fetched humidity " + humidity + " of type " + this.type + " for " + this.name);
+                this.log("Fetched humidity value " + humidity + "% of type '" + this.type + "' for accessory " + this.name);
             }
             return humidity;
         },
@@ -217,6 +238,7 @@ WeatherAccessory.prototype =
             } else if (this.locationByZip) {
                 url += "zip=" + this.locationByZip;
             }
+            this.log.debug("Using url: %s", url);
             return url;
         },
 

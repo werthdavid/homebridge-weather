@@ -90,6 +90,8 @@ To show cloudiness in percent configure as follows:
 
 This type publishes a value between 0 and 100 that indicates how far through the day we are where 0% is the sunrise (and everything before) and 100% is sunset (and everything after). 50% is noon accordingly.
 
+For using this value as trigger, you have to define a "pollingInterval" as well, otherwise the value only gets updated while having HomeApp in foreground.
+
 ```json
 "accessories": [
   {
@@ -97,7 +99,8 @@ This type publishes a value between 0 and 100 that indicates how far through the
      "apikey":"YOUR_KEY_HERE",
      "locationByCoordinates":"lat=48.70798341&lon=9.17019367",
      "name":"Sun",
-     "type":"sun"
+     "type":"sun",
+     "pollingInterval": 10
   }
 ]
 ```
@@ -135,7 +138,7 @@ I suggest the following settings:
        "location": "Stuttgart,de",
        "name": "OpenWeatherMap Temperature",
        "pollingInterval": 10,
-       "enableHistory": true,
+       "enableHistory": true
      }
 ]
 ```

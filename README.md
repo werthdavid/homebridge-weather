@@ -70,6 +70,40 @@ To show daily min/max values, you have to add two additional accessories:
 ]
 ```
 
+## Cloudiness
+
+To show cloudiness in percent configure as follows:
+
+```json
+"accessories": [
+  {
+     "accessory":"Weather",
+     "apikey":"YOUR_KEY_HERE",
+     "locationByCoordinates":"lat=48.70798341&lon=9.17019367",
+     "name":"Cloudiness",
+     "type":"clouds"
+  }
+]
+```
+
+## Sunrise/noon/sunset
+
+This type publishes a value between 0 and 100 that indicates how far through the day we are where 0% is the sunrise (and everything before) and 100% is sunset (and everything after). 50% is noon accordingly.
+
+```json
+"accessories": [
+  {
+     "accessory":"Weather",
+     "apikey":"YOUR_KEY_HERE",
+     "locationByCoordinates":"lat=48.70798341&lon=9.17019367",
+     "name":"Sun",
+     "type":"sun"
+  }
+]
+```
+
+## Hint
+
 **You can add multiple accessories if you want to display additional information like min/max or the temperature of different locations. Just make sure that the field `name` is unique**
 
 
@@ -123,7 +157,7 @@ Fields:
 * `name` is the name of the published accessory (required).
 * `showHumidity` weather or not show the humidity (optional, only works for current weather not forecast, defaults to true).
 * `nameHumidity` humidity can have a different name (optional, only works if `showHumidity` is true, defaults to the same as `name`).
-* `type` the type of the displayed value, either "min", "max" or "current" (optional, defaults to "current")
+* `type` the type of the displayed value, either "min", "max", "current", "clouds" or "sun" (optional, defaults to "current")
 * `pollingInterval` the time (in minutes) for periodically updating the temperature (optional, defaults to 0 which means polling only happens when opening the Home-App)
 * `enableHistory` flag for enabling the FakeGato-service (see above) for temperature and humidity logging (optional, defaults to false, only works when polling is enabled)
 

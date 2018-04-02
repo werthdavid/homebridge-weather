@@ -12,6 +12,7 @@
       "apikey": "YOUR_KEY_HERE",
       "locationByCoordinates": "lat=48.70798341&lon=9.17019367",
       "name": "Current Temp",
+      "showHumidity": true,
       "nameHumidity": "Current Humidity",
       "pollingInterval": 10,
       "enableHistory": true
@@ -29,6 +30,21 @@
       "locationByCoordinates": "lat=48.70798341&lon=9.17019367",
       "name": "Today Max",
       "type": "max"
+    },
+    {
+      "accessory": "Weather",
+      "apikey": "YOUR_KEY_HERE",
+      "locationByCoordinates": "lat=48.70798341&lon=9.17019367",
+      "name": "Cloudiness",
+      "type": "clouds"
+    },
+    {
+      "accessory": "Weather",
+      "apikey": "YOUR_KEY_HERE",
+      "locationByCoordinates": "lat=48.70798341&lon=9.17019367",
+      "name": "Sun",
+      "type": "sun",
+      "pollingInterval": 10
     }
   ]
 }

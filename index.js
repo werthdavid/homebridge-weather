@@ -65,18 +65,37 @@ WeatherAccessory.prototype =
     {
         backgroundPolling: function () {
             this.log.info("Polling data in background");
-            // Update Temperature
-            this.getStateTemp(function (error, temperature) {
-                if (!error && temperature != null) {
-                    temperatureService.setCharacteristic(Characteristic.CurrentTemperature, temperature);
-                }
-            }.bind(this));
+
+            if (this.type === "current" || this.type === "max" || this.type === "min") {
+                // Update Temperature
+                this.getStateTemp(function (error, temperature) {
+                    if (!error && temperature != null) {
+                        temperatureService.setCharacteristic(Characteristic.CurrentTemperature, temperature);
+                    }
+                }.bind(this));
+            }
 
             // Update Humidity if configured
             if (this.showHumidity && this.type === "current") {
                 this.getStateHum(function (error, humidity) {
                     if (!error && humidity != null) {
                         humidityService.setCharacteristic(Characteristic.CurrentRelativeHumidity, humidity);
+                    }
+                }.bind(this));
+            }
+
+            if (this.type === "clouds") {
+                this.getStateClouds(function (error, value) {
+                    if (!error && value != null) {
+                        humidityService.setCharacteristic(Characteristic.CurrentRelativeHumidity, value);
+                    }
+                }.bind(this));
+            }
+
+            if (this.type === "sun") {
+                this.getStateSun(function (error, value) {
+                    if (!error && value != null) {
+                        humidityService.setCharacteristic(Characteristic.CurrentRelativeHumidity, value);
                     }
                 }.bind(this));
             }
@@ -144,12 +163,73 @@ WeatherAccessory.prototype =
                 }.bind(this));
             } else {
                 try {
-                    this.setCacheObj(responseBody);
                     var humidity = this.returnHumFromCache();
                     this.log("Returning cached data", humidity);
                     callback(null, humidity);
                 } catch (error) {
                     this.log("Getting Humidity failed: %s", error);
+                    callback(error);
+                }
+            }
+        },
+
+        getStateClouds: function (callback) {
+            // Only fetch new data once per minute
+            if (!this.cachedWeatherObj || this.pollingInterval > 0 || this.lastupdate + 60 < (new Date().getTime() / 1000 | 0)) {
+                var url = this.makeURL();
+                this.httpRequest(url, function (error, response, responseBody) {
+                    if (error) {
+                        this.log("HTTP get weather function failed: %s", error.message);
+                        callback(error);
+                    } else {
+                        try {
+                            this.setCacheObj(responseBody);
+                            var value = this.returnCloudinessFromCache();
+                            callback(null, value);
+                        } catch (error2) {
+                            this.log("Getting Cloudiness failed: %s", error2, response, responseBody);
+                            callback(error2);
+                        }
+                    }
+                }.bind(this));
+            } else {
+                try {
+                    var value = this.returnCloudinessFromCache();
+                    this.log("Returning cached data", value);
+                    callback(null, value);
+                } catch (error) {
+                    this.log("Getting Cloudiness failed: %s", error);
+                    callback(error);
+                }
+            }
+        },
+
+        getStateSun: function (callback) {
+            // Only fetch new data once per minute
+            if (!this.cachedWeatherObj || this.pollingInterval > 0 || this.lastupdate + 60 < (new Date().getTime() / 1000 | 0)) {
+                var url = this.makeURL();
+                this.httpRequest(url, function (error, response, responseBody) {
+                    if (error) {
+                        this.log("HTTP get weather function failed: %s", error.message);
+                        callback(error);
+                    } else {
+                        try {
+                            this.setCacheObj(responseBody);
+                            var value = this.returnSunFromCache();
+                            callback(null, value);
+                        } catch (error2) {
+                            this.log("Getting Sun failed: %s", error2, response, responseBody);
+                            callback(error2);
+                        }
+                    }
+                }.bind(this));
+            } else {
+                try {
+                    var value = this.returnSunFromCache();
+                    this.log("Returning cached data", value);
+                    callback(null, value);
+                } catch (error) {
+                    this.log("Getting Sun failed: %s", error);
                     callback(error);
                 }
             }
@@ -163,12 +243,14 @@ WeatherAccessory.prototype =
             this.log.debug("Server response:", responseBody);
             this.cachedWeatherObj = JSON.parse(responseBody);
             this.lastupdate = (new Date().getTime() / 1000);
-            var temperature = this.returnTempFromCache();
-            var humidity;
-            if (this.showHumidity && this.type === "current") {
-                humidity = this.returnHumFromCache();
+            if (this.enableHistory) {
+                var temperature = this.returnTempFromCache();
+                var humidity;
+                if (this.showHumidity && this.type === "current") {
+                    humidity = this.returnHumFromCache();
+                }
+                this.addHistory(temperature, humidity);
             }
-            this.addHistory(temperature, humidity);
         },
 
         returnTempFromCache: function () {
@@ -211,17 +293,45 @@ WeatherAccessory.prototype =
         },
 
         returnHumFromCache: function () {
-            var humidity;
+            var value;
             if (this.cachedWeatherObj && this.cachedWeatherObj["main"]) {
-                humidity = parseFloat(this.cachedWeatherObj["main"]["humidity"]);
-                this.log("Fetched humidity value " + humidity + "% of type '" + this.type + "' for accessory " + this.name);
+                value = parseFloat(this.cachedWeatherObj["main"]["humidity"]);
+                this.log("Fetched humidity value " + value + "% of type '" + this.type + "' for accessory " + this.name);
             }
-            return humidity;
+            return value;
+        },
+
+        returnCloudinessFromCache: function () {
+            var value;
+            if (this.cachedWeatherObj && this.cachedWeatherObj["clouds"]) {
+                value = parseFloat(this.cachedWeatherObj["clouds"]["all"]);
+                this.log("Fetched cloudiness value " + value + "% of type '" + this.type + "' for accessory " + this.name);
+            }
+            return value;
+        },
+
+        returnSunFromCache: function () {
+            var value = 0;
+            if (this.cachedWeatherObj && this.cachedWeatherObj["sys"]) {
+                var sunrise = parseInt(this.cachedWeatherObj["sys"]["sunrise"]);
+                var sunset = parseInt(this.cachedWeatherObj["sys"]["sunset"]);
+                var now = Math.round(new Date().getTime() / 1000);
+                if (now > sunset) {
+                    // It's already dark outside
+                    value = 100;
+                } else if (now > sunrise) {
+                    // calculate how far though the day (where day is from sunrise to sunset) we are
+                    var intervalLen = (sunset - sunrise);
+                    value = ((now - sunrise) / intervalLen) * 100;
+                }
+                this.log("Fetched sun value " + value + "% of type '" + this.type + "' for accessory " + this.name);
+            }
+            return value;
         },
 
         makeURL: function () {
             var url = "http://api.openweathermap.org/data/2.5/";
-            if (this.type === "current") {
+            if (this.type === "current" || this.type === "clouds" || this.type === "sun") {
                 url += "weather";
             } else {
                 // Min-/Max-sensors have different endpoint
@@ -278,7 +388,7 @@ WeatherAccessory.prototype =
 
             temperatureService
                 .getCharacteristic(Characteristic.CurrentTemperature)
-                .setProps({minValue: -30});
+                .setProps({minValue: -60});
 
             temperatureService
                 .getCharacteristic(Characteristic.CurrentTemperature)
@@ -293,6 +403,20 @@ WeatherAccessory.prototype =
                     .on("get", this.getStateHum.bind(this));
 
                 services = [informationService, temperatureService, humidityService];
+            } else if (this.type === "clouds") {
+                humidityService = new Service.HumiditySensor(this.name);
+                humidityService
+                    .getCharacteristic(Characteristic.CurrentRelativeHumidity)
+                    .on("get", this.getStateClouds.bind(this));
+
+                services = [informationService, humidityService];
+            } else if (this.type === "sun") {
+                humidityService = new Service.HumiditySensor(this.name);
+                humidityService
+                    .getCharacteristic(Characteristic.CurrentRelativeHumidity)
+                    .on("get", this.getStateSun.bind(this));
+
+                services = [informationService, humidityService];
             } else {
                 services = [informationService, temperatureService];
             }

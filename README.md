@@ -30,7 +30,7 @@ Example for configuration by City
 ]
 ```
 
-### By ID
+#### By ID
 
 replace `location` with
 
@@ -38,7 +38,7 @@ replace `location` with
 "locationById": "2172797",
 ```
 
-### By Coordinates
+#### By Coordinates
 
 replace `location` with
 
@@ -46,6 +46,21 @@ replace `location` with
 "locationByCoordinates": "lat=48.70798341&lon=9.17019367",
 ```
 
+### Celsius/Fahrenheit
+
+add `unit` with one of the following values:
+
+```json
+"unit": "metric",
+```
+for Celsius (default)
+
+or
+
+```json
+"unit": "imperial",
+```
+for Fahrenheit
 
 ## Forecast
 
@@ -160,9 +175,10 @@ Fields:
 * `name` is the name of the published accessory (required).
 * `showHumidity` weather or not show the humidity (optional, only works for current weather not forecast, defaults to true).
 * `nameHumidity` humidity can have a different name (optional, only works if `showHumidity` is true, defaults to the same as `name`).
-* `type` the type of the displayed value, either "min", "max", "current", "clouds" or "sun" (optional, defaults to "current")
+* `type` the type of the displayed value, either `min`, `max`, `current`, `clouds` or `sun` (optional, defaults to `current`)
 * `pollingInterval` the time (in minutes) for periodically updating the temperature (optional, defaults to 0 which means polling only happens when opening the Home-App)
 * `enableHistory` flag for enabling the FakeGato-service (see above) for temperature and humidity logging (optional, defaults to false, only works when polling is enabled)
+* `unit` change the temperature unit to Celsius or Fahrenheit (optional, defaults to `metric` (Celsius), if you want Fahrenheit use `imperial`)
 
 ## Known Issues
 

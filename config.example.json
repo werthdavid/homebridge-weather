@@ -15,7 +15,8 @@
       "showHumidity": true,
       "nameHumidity": "Current Humidity",
       "pollingInterval": 10,
-      "enableHistory": true
+      "enableHistory": true,
+      "unit": "metric"
     },
     {
       "accessory": "Weather",

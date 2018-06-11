@@ -44,6 +44,7 @@ function WeatherAccessory(log, config) {
     }
 
     this.type = config["type"] || "current";
+    this.unit = config["unit"] || "metric";
     this.cachedWeatherObj = undefined;
     this.lastupdate = 0;
 
@@ -338,7 +339,7 @@ WeatherAccessory.prototype =
                 url += "forecast";
             }
 
-            url += "?APPID=" + this.apikey + "&units=metric&";
+            url += "?APPID=" + this.apikey + "&units=" + this.unit + "&";
             if (this.locationByCity) {
                 url += "q=" + this.locationByCity;
             } else if (this.locationById) {

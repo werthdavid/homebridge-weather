@@ -46,9 +46,13 @@ replace `location` with
 "locationByCoordinates": "lat=48.70798341&lon=9.17019367",
 ```
 
-### Celsius/Fahrenheit
+### Celsius/Fahrenheit (you probably don't have to change anything here)
 
-add `unit` with one of the following values:
+**iOS should take care of the correct unit, HomeApp converts the values internally.**
+
+
+If you want a different unit than your OS' settings, you can change the unit explicitly by adding
+ `unit` with one of the following values:
 
 ```json
 "unit": "metric",
@@ -178,7 +182,7 @@ Fields:
 * `type` the type of the displayed value, either `min`, `max`, `current`, `clouds` or `sun` (optional, defaults to `current`)
 * `pollingInterval` the time (in minutes) for periodically updating the temperature (optional, defaults to 0 which means polling only happens when opening the Home-App)
 * `enableHistory` flag for enabling the FakeGato-service (see above) for temperature and humidity logging (optional, defaults to false, only works when polling is enabled)
-* `unit` change the temperature unit to Celsius or Fahrenheit (optional, defaults to `metric` (Celsius), if you want Fahrenheit use `imperial`)
+* `unit` change the temperature unit to Celsius or Fahrenheit explicitly (optional, defaults to `metric` (Celsius), for Fahrenheit use `imperial`. Beware that iOS usually does the job correctly)
 
 ## Known Issues
 

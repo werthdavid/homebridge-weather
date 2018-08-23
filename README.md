@@ -187,3 +187,11 @@ Fields:
 ## Known Issues
 
 * Default Home-App can't trigger scenes: try [Hesperus App](https://itunes.apple.com/de/app/hesperus/id969348892?mt=8) instead
+
+## Advanced usage
+
+If you need more features like a more detailed forecast, take a look at **homebridge-weather-plus** ([here](https://github.com/naofireblade/homebridge-weather-plus)), it now supports OpenWeatherMap as well.
+
+![Current Conditions in Elgato Eve app](https://i.imgur.com/ql9t8w0l.png)
+![History graph in Elgato Eve app](https://i.imgur.com/8opO7hel.png)
+>(c) Screenshots are taken from the Elgato Eve app

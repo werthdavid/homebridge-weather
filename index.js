@@ -380,7 +380,7 @@ WeatherAccessory.prototype =
             informationService
                 .setCharacteristic(Characteristic.Manufacturer, "OpenWeatherMap")
                 .setCharacteristic(Characteristic.Model, "Location")
-                .setCharacteristic(Characteristic.SerialNumber, hostname + "-" + this.name);
+                .setCharacteristic(Characteristic.SerialNumber, "Homebridge-Weather");
 
             temperatureService = new Service.TemperatureSensor(this.name);
             temperatureService

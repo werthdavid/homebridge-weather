@@ -1,6 +1,6 @@
 {
   "name": "homebridge-weather",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "Homebridge plugin for displaying the weather from openweathermap.org",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/werthdavid/homebridge-weather#readme",
   "dependencies": {
-    "fakegato-history": "^0.5.1",
-    "request": "^2.87.0"
+    "fakegato-history": "^0.5.5",
+    "request": "^2.88.0"
   }
 }

@@ -5,7 +5,6 @@ var temperatureService;
 var humidityService;
 var request = require("request");
 var os = require("os");
-var hostname = os.hostname();
 
 module.exports = function (homebridge) {
     Service = homebridge.hap.Service;
@@ -31,6 +30,11 @@ function WeatherAccessory(log, config) {
         this.showHumidity = config["showHumidity"];
     } else {
         this.showHumidity = true;
+    }
+    if (config["showTemperature"] != null) {
+        this.showTemperature = config["showTemperature"];
+    } else {
+        this.showTemperature = true;
     }
     if (config["pollingInterval"] != null) {
         this.pollingInterval = parseInt(config["pollingInterval"]) * 1000 * 60;
@@ -67,7 +71,7 @@ WeatherAccessory.prototype =
         backgroundPolling: function () {
             this.log.info("Polling data in background");
 
-            if (this.type === "current" || this.type === "max" || this.type === "min") {
+            if (this.showTemperature && (this.type === "current" || this.type === "max" || this.type === "min")) {
                 // Update Temperature
                 this.getStateTemp(function (error, temperature) {
                     if (!error && temperature != null) {
@@ -245,8 +249,12 @@ WeatherAccessory.prototype =
             this.cachedWeatherObj = JSON.parse(responseBody);
             this.lastupdate = (new Date().getTime() / 1000);
             if (this.enableHistory) {
-                var temperature = this.returnTempFromCache();
+                var temperature;
                 var humidity;
+
+                if (this.showTemperature) {
+                    temperature = this.returnTempFromCache();
+                }
                 if (this.showHumidity && this.type === "current") {
                     humidity = this.returnHumFromCache();
                 }
@@ -396,30 +404,35 @@ WeatherAccessory.prototype =
                 .setProps({maxValue: 120});
 
 
-            var services = [];
+            var services = [informationService];
             if (this.showHumidity && this.type === "current") {
                 humidityService = new Service.HumiditySensor(this.nameHumidity);
                 humidityService
                     .getCharacteristic(Characteristic.CurrentRelativeHumidity)
                     .on("get", this.getStateHum.bind(this));
 
-                services = [informationService, temperatureService, humidityService];
+                if (this.showTemperature) {
+                        services[services.length] = temperatureService;
+                }
+                services[services.length] = humidityService;
             } else if (this.type === "clouds") {
                 humidityService = new Service.HumiditySensor(this.name);
                 humidityService
                     .getCharacteristic(Characteristic.CurrentRelativeHumidity)
                     .on("get", this.getStateClouds.bind(this));
 
-                services = [informationService, humidityService];
+                services[services.length] = humidityService;
             } else if (this.type === "sun") {
                 humidityService = new Service.HumiditySensor(this.name);
                 humidityService
                     .getCharacteristic(Characteristic.CurrentRelativeHumidity)
                     .on("get", this.getStateSun.bind(this));
 
-                services = [informationService, humidityService];
+                services[services.length] = humidityService;
             } else {
-                services = [informationService, temperatureService];
+                if (this.showTemperature) {
+                    services[services.length] = temperatureService;
+                }
             }
 
             // FakeGato

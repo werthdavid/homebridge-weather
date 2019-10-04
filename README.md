@@ -179,6 +179,7 @@ Fields:
 * `name` is the name of the published accessory (required).
 * `showHumidity` weather or not show the humidity (optional, only works for current weather not forecast, defaults to true).
 * `nameHumidity` humidity can have a different name (optional, only works if `showHumidity` is true, defaults to the same as `name`).
+* `showTemperature` weather or not show the temperature (optional, setting to false only makes sense if `showHumidity` os set to true, defaults to true).
 * `type` the type of the displayed value, either `min`, `max`, `current`, `clouds` or `sun` (optional, defaults to `current`)
 * `pollingInterval` the time (in minutes) for periodically updating the temperature (optional, defaults to 0 which means polling only happens when opening the Home-App)
 * `enableHistory` flag for enabling the FakeGato-service (see above) for temperature and humidity logging (optional, defaults to false, only works when polling is enabled)

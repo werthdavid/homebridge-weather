@@ -105,6 +105,14 @@ WeatherAccessory.prototype =
                 }.bind(this));
             }
 
+            if (this.type === "windspeed") {
+                this.getStateSun(function (error, value) {
+                    if (!error && value != null) {
+                        humidityService.setCharacteristic(Characteristic.CurrentRelativeHumidity, value);
+                    }
+                }.bind(this));
+            }
+
             var that = this;
             setTimeout(function () {
                 // Recursive call after certain time
@@ -240,6 +248,37 @@ WeatherAccessory.prototype =
             }
         },
 
+        getStateWindspeed: function (callback) {
+            // Only fetch new data once per minute
+            if (!this.cachedWeatherObj || this.pollingInterval > 0 || this.lastupdate + 60 < (new Date().getTime() / 1000 | 0)) {
+                var url = this.makeURL();
+                this.httpRequest(url, function (error, response, responseBody) {
+                    if (error) {
+                        this.log("HTTP get weather function failed: %s", error.message);
+                        callback(error);
+                    } else {
+                        try {
+                            this.setCacheObj(responseBody);
+                            var value = this.returnWindspeedFromCache();
+                            callback(null, value);
+                        } catch (error2) {
+                            this.log("Getting Windspeed failed: %s", error2, response, responseBody);
+                            callback(error2);
+                        }
+                    }
+                }.bind(this));
+            } else {
+                try {
+                    var value = this.returnWindspeedFromCache();
+                    this.log("Returning cached data", value);
+                    callback(null, value);
+                } catch (error) {
+                    this.log("Getting Windspeed failed: %s", error);
+                    callback(error);
+                }
+            }
+        },
+
         /**
          * Handles the response from HTTP-API and caches the data
          * @param responseBody
@@ -338,6 +377,15 @@ WeatherAccessory.prototype =
             return value;
         },
 
+        returnWindspeedFromCache: function () {
+            var value;
+            if (this.cachedWeatherObj && this.cachedWeatherObj["wind"]) {
+                value = parseFloat(this.cachedWeatherObj["wind"]["speed"]);
+                this.log("Fetched windspeed value " + value + "% of type '" + this.type + "' for accessory " + this.name);
+            }
+            return value;
+        },
+
         makeURL: function () {
             var url = "http://api.openweathermap.org/data/2.5/";
             if (this.type === "current" || this.type === "clouds" || this.type === "sun") {
@@ -427,6 +475,13 @@ WeatherAccessory.prototype =
                 humidityService
                     .getCharacteristic(Characteristic.CurrentRelativeHumidity)
                     .on("get", this.getStateSun.bind(this));
+
+                services[services.length] = humidityService;
+            }  else if (this.type === "windspeed") {
+                humidityService = new Service.HumiditySensor(this.name);
+                humidityService
+                    .getCharacteristic(Characteristic.CurrentRelativeHumidity)
+                    .on("get", this.getStateWindspeed.bind(this));
 
                 services[services.length] = humidityService;
             } else {

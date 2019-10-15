@@ -105,6 +105,28 @@ To show cloudiness in percent configure as follows:
 ]
 ```
 
+## Wind-speed
+
+To show wind-speed in `meter/sec` configure as follows:
+
+```json
+"accessories": [
+  {
+     "accessory":"Weather",
+     "apikey":"YOUR_KEY_HERE",
+     "locationByCoordinates":"lat=48.70798341&lon=9.17019367",
+     "name":"Wind",
+     "type":"windspeed"
+  }
+]
+```
+
+To display in `miles/hour` additionally configure 
+
+```json
+   "unit": "imperial"
+```
+
 ## Sunrise/noon/sunset
 
 This type publishes a value between 0 and 100 that indicates how far through the day we are where 0% is the sunrise (and everything before) and 100% is sunset (and everything after). 50% is noon accordingly.
@@ -180,7 +202,7 @@ Fields:
 * `showHumidity` weather or not show the humidity (optional, only works for current weather not forecast, defaults to true).
 * `nameHumidity` humidity can have a different name (optional, only works if `showHumidity` is true, defaults to the same as `name`).
 * `showTemperature` weather or not show the temperature (optional, setting to false only makes sense if `showHumidity` os set to true, defaults to true).
-* `type` the type of the displayed value, either `min`, `max`, `current`, `clouds` or `sun` (optional, defaults to `current`)
+* `type` the type of the displayed value, either `min`, `max`, `current`, `clouds`, `sun` or `windspeed` (optional, defaults to `current`)
 * `pollingInterval` the time (in minutes) for periodically updating the temperature (optional, defaults to 0 which means polling only happens when opening the Home-App)
 * `enableHistory` flag for enabling the FakeGato-service (see above) for temperature and humidity logging (optional, defaults to false, only works when polling is enabled)
 * `unit` change the temperature unit to Celsius or Fahrenheit explicitly (optional, defaults to `metric` (Celsius), for Fahrenheit use `imperial`. Beware that iOS usually does the job correctly)

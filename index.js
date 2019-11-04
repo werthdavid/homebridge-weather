@@ -106,7 +106,7 @@ WeatherAccessory.prototype =
             }
 
             if (this.type === "windspeed") {
-                this.getStateSun(function (error, value) {
+                this.getStateWindspeed(function (error, value) {
                     if (!error && value != null) {
                         humidityService.setCharacteristic(Characteristic.CurrentRelativeHumidity, value);
                     }

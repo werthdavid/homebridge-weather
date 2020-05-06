@@ -388,7 +388,7 @@ WeatherAccessory.prototype =
 
         makeURL: function () {
             var url = "http://api.openweathermap.org/data/2.5/";
-            if (this.type === "current" || this.type === "clouds" || this.type === "sun") {
+            if (this.type === "current" || this.type === "clouds" || this.type === "sun" || this.type === "windspeed") {
                 url += "weather";
             } else {
                 // Min-/Max-sensors have different endpoint

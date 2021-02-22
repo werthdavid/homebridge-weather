@@ -3,8 +3,7 @@
 var Service, Characteristic, FakeGatoHistoryService;
 var temperatureService;
 var humidityService;
-var request = require("request");
-var os = require("os");
+var got = require("got");
 
 module.exports = function (homebridge) {
     Service = homebridge.hap.Service;
@@ -460,7 +459,7 @@ WeatherAccessory.prototype =
                     .on("get", this.getStateHum.bind(this));
 
                 if (this.showTemperature) {
-                        services[services.length] = temperatureService;
+                    services[services.length] = temperatureService;
                 }
                 services[services.length] = humidityService;
             } else if (this.type === "clouds") {
@@ -477,7 +476,7 @@ WeatherAccessory.prototype =
                     .on("get", this.getStateSun.bind(this));
 
                 services[services.length] = humidityService;
-            }  else if (this.type === "windspeed") {
+            } else if (this.type === "windspeed") {
                 humidityService = new Service.HumiditySensor(this.name);
                 humidityService
                     .getCharacteristic(Characteristic.CurrentRelativeHumidity)
@@ -500,14 +499,12 @@ WeatherAccessory.prototype =
         },
 
         httpRequest: function (url, callback) {
-            request({
-                    url: url,
-                    body: "",
-                    method: "GET",
-                    rejectUnauthorized: false
-                },
-                function (error, response, body) {
-                    callback(error, response, body);
+            got(url)
+                .then(response => {
+                    callback(null, response, response.body);
+                })
+                .catch(error => {
+                    callback(error);
                 })
         }
 

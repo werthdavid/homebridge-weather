@@ -1,0 +1,108 @@
+{
+  "pluginAlias": "Weather",
+  "pluginType": "accessory",
+  "singular": true,
+  "headerDisplay": "Homebridge plugin for displaying the weather from openweathermap.org.",
+  "footerDisplay": "Visit the [Project Page](https://github.com/werthdavid/homebridge-weather) if you have more questions.",
+  "schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+      "accessory": {
+        "type": "string"
+      },
+      "apikey":{
+        "title":"API-Key",
+        "type":"string"
+      },
+      "name":{
+        "title":"Name of the sensor",
+        "type":"string"
+      },
+      "location":{
+        "title":"City-name query string",
+        "type":"string"
+      },
+      "locationById":{
+        "title":"City-ID query string",
+        "type":"string"
+      },
+      "locationByCoordinates":{
+        "title":"Geo query string",
+        "type":"string"
+      },
+      "locationByZip":{
+        "title":"ZIP-code query string",
+        "type":"string"
+      },
+      "showHumidity":{
+        "title":"Show Humidity Sensor as well",
+        "type":"boolean"
+      },
+      "nameHumidity":{
+        "title":"Extra name for Humidity Sensor",
+        "type":"string"
+      },
+      "showTemperature":{
+        "title":"Show or hide Temperature Sensor",
+        "type":"boolean"
+      },
+      "type":{
+        "title":"Sensor Type",
+        "type":"string",
+        "default": "current",
+        "oneOf": [
+          {
+            "title": "Current temperature",
+            "enum": [
+              "current"
+            ]
+          },
+          {
+            "title": "Todays min temperature",
+            "enum": [
+              "min"
+            ]
+          },
+          {
+            "title": "Todays max temperature",
+            "enum": [
+              "max"
+            ]
+          },
+          {
+            "title": "Cloudiness",
+            "enum": [
+              "clouds"
+            ]
+          },
+          {
+            "title": "Sun level",
+            "enum": [
+              "sun"
+            ]
+          },
+          {
+            "title": "Wind speed",
+            "enum": [
+              "windspeed"
+            ]
+          }
+        ],
+        "required": true
+      },
+      "pollingInterval":{
+        "title":"Polling Interval (minutes) for periodically updating the temperature",
+        "type":"integer"
+      },
+      "enableHistory":{
+        "title":"Enable History (FakeGato, works only if polling is enabled)",
+        "type":"string"
+      },
+      "unit":{
+        "title":"Unit (change the temperature unit to Celsius or Fahrenheit explicitly)",
+        "type":"string"
+      }
+    }
+  }
+}

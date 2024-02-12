@@ -27,6 +27,6 @@
   "homepage": "https://github.com/werthdavid/homebridge-weather#readme",
   "dependencies": {
     "fakegato-history": "^0.6.1",
-    "got": "^11.8.1"
+    "got": "^12.5.3"
   }
 }
